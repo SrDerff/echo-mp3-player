@@ -8,6 +8,6 @@ int main() {
     System::Console::SetWindowSize(200, 60);
 
     AppController app;
-    app.run();
+    app.run(); //xd
     return 0;
 }
