@@ -59,6 +59,10 @@ private:
     void performSearch();
     void playSelectedSearchSong();
 
+    void moveDownQueue();
+    void moveUpQueue();
+    void playSelectedQueueSong();
+
 public:
     AppController();
     ~AppController() = default;
