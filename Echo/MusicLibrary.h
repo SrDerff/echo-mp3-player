@@ -1,6 +1,5 @@
 #pragma once
 #include "Playlist.h"
-#include "SearchFilter.h"
 #include "BinarySearchTree.h"
 #include "Tree.h"
 #include "Graph.h"
@@ -9,8 +8,6 @@
 #include "Artist.h"
 #include "Album.h"
 #include <vector>
-//#include <algorithm>
-//#include <cctype>
 
 using namespace std;
 using uint = unsigned int;
@@ -26,6 +23,7 @@ private:
     vector<Artist> artists;
     vector<Album> albums;
     CircularDoublyLinkedList<Song> playbackHistory;
+    Stack<Song> sessionHistory;
 
     static string toLowerStr(string str) {
         for (char& c : str) c = tolower(static_cast<unsigned char>(c));
@@ -131,21 +129,6 @@ public:
         if (p) p->addSong(song);
     }
 
-    vector<Song*> searchInLibrary(const string& query) {
-        return SearchFilter<Song>::searchByString(
-            allSongs, [](const Song& s) { return s.getName(); }, query);
-    }
-
-    vector<Song*> searchByAuthor(const string& query) {
-        return SearchFilter<Song>::searchByString(
-            allSongs, [](const Song& s) { return s.getAuthor(); }, query);
-    }
-
-    vector<Song*> searchByGenre(const string& query) {
-        return SearchFilter<Song>::searchByString(
-            allSongs, [](const Song& s) { return s.getGenre(); }, query);
-    }
-
     vector<Song*> getSongsSortedByName() {
         vector<Song*> all = getAllSongPtrs();
         SortEngine<Song>::quickSort(all, [](Song* a, Song* b) {
@@ -222,6 +205,15 @@ public:
         cout << "==========================\n";
     }
 
+    void addToSessionHistory(const Song& song) {
+        if (!sessionHistory.isEmpty()) {
+            Song top = sessionHistory.top();
+            if (top.getSource() == song.getSource()) return; // evita duplicado consecutivo
+        }
+        sessionHistory.push(song);
+    }
+    Stack<Song>* getSessionHistory() { return &sessionHistory; }
+
     /**
      * @brief Limpia TODA la biblioteca sin destruir el objeto.
      * Usa esto en vez de 'lib = MusicLibrary()' para evitar el crash.
@@ -236,6 +228,7 @@ public:
         artists.clear();
         albums.clear();
         playbackHistory.clear();
+        sessionHistory.clear();   
     }
 
     void printPlaylists() const {
