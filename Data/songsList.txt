@@ -1,0 +1,60 @@
+Alright|Kendrick Lamar|..\\Canciones\\Alright.wav|0|Unknown|0|0
+AM|Nio Garcia|..\\Canciones\\AM.wav|0|Unknown|0|0
+Animals|Martin Garrix|..\\Canciones\\Animals.wav|0|Unknown|0|0
+Apocalypse|Cigarettes After Sex|..\\Canciones\\Apocalypse.wav|0|Unknown|0|0
+As It Was|Harry Styles|..\\Canciones\\AsItWas.wav|0|Unknown|0|0
+Bad Guy|Billie Eilish|..\\Canciones\\BadGuy.wav|0|Unknown|0|0
+Best Friend|Rex Orange County|..\\Canciones\\BestFriend.wav|0|Unknown|0|0
+Blinding Lights|The Weeknd|..\\Canciones\\BlindingLights.wav|0|Unknown|0|0
+Boulevard of Broken Dreams|Green Day|..\\Canciones\\Boulevard.wav|0|Unknown|0|0
+Californication|Red Hot Chili Peppers|..\\Canciones\\Californication.wav|0|Unknown|0|0
+Callaita|Bad Bunny|..\\Canciones\\Callaita.wav|0|Unknown|0|0
+Can't Stop the Feeling!|Justin Timberlake|..\\Canciones\\CantStopFeeling.wav|0|Unknown|0|0
+Chamber Of Reflection|Mac DeMarco|..\\Canciones\\ChamberReflection.wav|0|Unknown|0|0
+Closer|The Chainsmokers ft. Halsey|..\\Canciones\\Closer.wav|0|Unknown|0|0
+Come As You Are|Nirvana|..\\Canciones\\ComeAsYouAre.wav|0|Unknown|0|0
+Creep|Radiohead|..\\Canciones\\Creep.wav|0|Unknown|0|0
+Dakiti|Bad Bunny ft. Jhayco|..\\Canciones\\Dakiti.wav|0|Unknown|0|0
+DNA.|Kendrick Lamar|..\\Canciones\\DNA.wav|0|Unknown|0|0
+Do I Wanna Know?|Arctic Monkeys|..\\Canciones\\DoIWannaKnow.wav|0|Unknown|0|0
+Don't You Worry Child|Swedish House Mafia|..\\Canciones\\DontWorryChild.wav|0|Unknown|0|0
+Ella Baila Sola|Eslabon Armado ft. Peso Pluma|..\\Canciones\\EllaBailaSola.wav|0|Unknown|0|0
+Feliz Cumple Ferxxo|Feid|..\\Canciones\\Ferxxo.wav|0|Unknown|0|0
+Firework|Katy Perry|..\\Canciones\\Firework.wav|0|Unknown|0|0
+Get Lucky|Daft Punk ft. Pharrell Williams|..\\Canciones\\GetLucky.wav|0|Unknown|0|0
+Glimpse Of Us|Joji|..\\Canciones\\GlimpseOfUs.wav|0|Unknown|0|0
+God's Plan|Drake|..\\Canciones\\GodsPlan.wav|0|Unknown|0|0
+Goosebumps|Travis Scott|..\\Canciones\\Goosebumps.wav|0|Unknown|0|0
+HUMBLE.|Kendrick Lamar|..\\Canciones\\Humble.wav|0|Unknown|0|0
+Karma Police|Radiohead|..\\Canciones\\KarmaPolice.wav|0|Unknown|0|0
+La Cancion|J Balvin ft. Bad Bunny|..\\Canciones\\LaCancion.wav|0|Unknown|0|0
+Last Nite|The Strokes|..\\Canciones\\LastNite.wav|0|Unknown|0|0
+Levels|Avicii|..\\Canciones\\Levels.wav|0|Unknown|0|0
+Levitating|Dua Lipa|..\\Canciones\\Levitating.wav|0|Unknown|0|0
+Lose Yourself|Eminem|..\\Canciones\\LoseYourself.wav|0|Unknown|0|0
+Lucid Dreams|Juice WRLD|..\\Canciones\\LucidDreams.wav|0|Unknown|0|0
+Mr. Brightside|The Killers|..\\Canciones\\MrBrightside.wav|0|Unknown|0|0
+Normal|Feid|..\\Canciones\\Normal.wav|0|Unknown|0|0
+No Role Modelz|J. Cole|..\\Canciones\\NoRoleModelz.wav|0|Unknown|0|0
+Nothing's Gonna Hurt You Baby|Cigarettes After Sex|..\\Canciones\\NothingsGonnaHurt.wav|0|Unknown|0|0
+One More Time|Daft Punk|..\\Canciones\\OneMoreTime.wav|0|Unknown|0|0
+Outside|Calvin Harris ft. Ellie Goulding|..\\Canciones\\Outside.wav|0|Unknown|0|0
+Pretty Girl|Clairo|..\\Canciones\\PrettyGirl.wav|0|Unknown|0|0
+Provenza|Karol G|..\\Canciones\\Provenza.wav|0|Unknown|0|0
+Scared To Be Lonely|Martin Garrix ft. Dua Lipa|..\\Canciones\\ScaredToBeLonely.wav|0|Unknown|0|0
+Seven Nation Army|The White Stripes|..\\Canciones\\SevenNationArmy.wav|0|Unknown|0|0
+Shape of You|Ed Sheeran|..\\Canciones\\ShapeOfYou.wav|0|Unknown|0|0
+Sicko Mode|Travis Scott ft. Drake|..\\Canciones\\SickoMode.wav|0|Unknown|0|0
+Slow Dancing In The Dark|Joji|..\\Canciones\\SlowDancing.wav|0|Unknown|0|0
+Sofia|Clairo|..\\Canciones\\Sofia.wav|0|Unknown|0|0
+Space Song|Beach House|..\\Canciones\\SpaceSong.wav|0|Unknown|0|0
+Stronger|Kanye West|..\\Canciones\\Stronger.wav|0|Unknown|0|0
+Style|Taylor Swift|..\\Canciones\\Style.wav|0|Unknown|0|0
+Summer|Calvin Harris|..\\Canciones\\Summer.wav|0|Unknown|0|0
+Sunflower|Rex Orange County|..\\Canciones\\Sunflower.wav|0|Unknown|0|0
+Smells Like Teen Spirit|Nirvana|..\\Canciones\\TeenSpirit.wav|0|Unknown|0|0
+thank u, next|Ariana Grande|..\\Canciones\\ThankUNext.wav|0|Unknown|0|0
+Titi Me Pregunto|Bad Bunny|..\\Canciones\\TitiMePregunto.wav|0|Unknown|0|0
+Tusa|Karol G ft. Nicki Minaj|..\\Canciones\\Tusa.wav|0|Unknown|0|0
+Uptown Funk|Mark Ronson ft. Bruno Mars|..\\Canciones\\UptownFunk.wav|0|Unknown|0|0
+Wake Me Up|Avicii|..\\Canciones\\WakeMeUp.wav|0|Unknown|0|0

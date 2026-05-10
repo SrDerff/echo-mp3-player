@@ -1,0 +1,6 @@
+[LIBRARY]
+Alright|Kendrick Lamar|"C:/Users/USUARIO/source/repos/echo-mp3-player/Canciones/Alright.mp3"|194|Hip-hop
+[PLAYLISTS]
+play
+
+[ENDPLAYLIST]
