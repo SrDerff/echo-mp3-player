@@ -129,7 +129,7 @@ void Interface::drawVolumeBar(int x, int y, int level) {
 
 void Interface::drawTabs(int x, int y, int selectedX) {
     drawBox(x, y, 196, 3, PANEL_R, PANEL_G, PANEL_B);
-    fillRect(x+1, y+1, 194, 1,' ',PANEL_R, PANEL_G, PANEL_B);
+    fillRect(x + 1, y + 1, 194, 1, ' ', PANEL_R, PANEL_G, PANEL_B);
 
     if (selectedX == 1) {
         fillRect(x + 63, y + 1, 12, 1, ' ', 255, 255, 255, 40, 58, 78);
@@ -189,7 +189,7 @@ void Interface::drawTabs(int x, int y, int selectedX) {
 
         writeAt(x + 125, y + 1, "Search", TITLE_R, TITLE_G, TITLE_B);
     }
-   
+
 }
 
 void Interface::drawTableHeader(int x, int y) {
@@ -428,14 +428,14 @@ void Interface::displayHud(MusicLibrary& library, int selectedIndex, int topInde
 
 void Interface::refreshHud(MusicLibrary& library, int selectedIndex, int topIndex)
 {
-	this->fillRect(80, 3, 40, 2, ' ', 22, 24, 37, 22, 24, 37);
+    this->fillRect(80, 3, 40, 2, ' ', 22, 24, 37, 22, 24, 37);
     string name = library.getAllSongs()->getAt(selectedIndex).getName();
     string artist = library.getAllSongs()->getAt(selectedIndex).getAuthor();
     int center = 196 / 2;
-	int nameX = center - name.size() / 2;
-	int artistX = center - artist.size() / 2;
+    int nameX = center - name.size() / 2;
+    int artistX = center - artist.size() / 2;
     writeAt(nameX, 3, name, TITLE_R, TITLE_G, TITLE_B);
-	writeAt(artistX, 4, artist, SOFT_R, SOFT_G, SOFT_B);
+    writeAt(artistX, 4, artist, SOFT_R, SOFT_G, SOFT_B);
 }
 
 void Interface::displayTab() {
@@ -515,4 +515,115 @@ void Interface::displayMenu(MusicLibrary& library, int selectedIndex, int topInd
     displayLibrary(library, selectedIndex, topIndex);
     drawBottomSeekbar(2, 54, 196);
     drawSpectrum(130, 50, playing);
+}
+// ============================================================
+// Renderizado de resultados de busqueda (con copias seguras)
+// ============================================================
+
+void Interface::displaySearchWithResults(vector<Song>& results, int selectedIndex, int topIndex, const string& query) {
+    drawTabs(2, 8, 5);
+
+    string queryLine = "Search: " + query + "_";
+    writeAt(4, 11, queryLine, TEXT_R, TEXT_G, TEXT_B);
+
+    drawBox(2, 12, 196, 40, PANEL_R, PANEL_G, PANEL_B);
+    drawTableHeader(4, 14);
+    drawResultRows(4, 17, results, selectedIndex, topIndex);
+    vLine(121, 13, 38, '|', PANEL_R, PANEL_G, PANEL_B);
+    drawRightPanelPlaceholder(131, 13, 58, 31);
+}
+
+void Interface::drawResultRows(int x, int y, vector<Song>& results, int selectedIndex, int topIndex) {
+    int currentIndex = 0;
+    int drawnRows = 0;
+
+    while (currentIndex < topIndex && currentIndex < (int)results.size()) {
+        currentIndex++;
+    }
+
+    while (currentIndex < (int)results.size() && drawnRows < kLibraryVisibleRows) {
+        Song& song = results[currentIndex]; // referencia a copia segura en el vector
+        int yy = y + drawnRows * 2;
+        bool selected = (currentIndex == selectedIndex);
+
+        string artist = fitText(song.getAuthor(), 30);
+        string title = fitText(song.getName(), 45);
+        string duration = formatDuration(song.getDuration());
+
+        fillRect(x - 1, yy, 117, 1, ' ', 255, 255, 255,
+            selected ? SELECT_BG_R : BG_R,
+            selected ? SELECT_BG_G : BG_G,
+            selected ? SELECT_BG_B : BG_B);
+
+        if (selected) {
+            writeAt(x, yy, artist, TITLE_R, TITLE_G, TITLE_B, SELECT_BG_R, SELECT_BG_G, SELECT_BG_B);
+            writeAt(x + 37, yy, title, TITLE_R, TITLE_G, TITLE_B, SELECT_BG_R, SELECT_BG_G, SELECT_BG_B);
+            writeAt(x + 108, yy, duration, TITLE_R, TITLE_G, TITLE_B, SELECT_BG_R, SELECT_BG_G, SELECT_BG_B);
+        }
+        else {
+            writeAt(x, yy, artist, SOFT_R, SOFT_G, SOFT_B, BG_R, BG_G, BG_B);
+            writeAt(x + 37, yy, title, SOFT_R, SOFT_G, SOFT_B, BG_R, BG_G, BG_B);
+            writeAt(x + 108, yy, duration, SOFT_R, SOFT_G, SOFT_B, BG_R, BG_G, BG_B);
+        }
+
+        currentIndex++;
+        drawnRows++;
+    }
+
+    if (drawnRows == 0) {
+        writeAt(x, y, "No se encontraron resultados.", DIM_R, DIM_G, DIM_B);
+        return;
+    }
+
+    while (drawnRows < kLibraryVisibleRows) {
+        int yy = y + drawnRows * 2;
+        fillRect(x - 1, yy, 117, 1, ' ', 255, 255, 255, BG_R, BG_G, BG_B);
+        drawnRows++;
+    }
+}
+
+void Interface::refreshSearchRows(vector<Song>& results, int selectedIndex, int topIndex) {
+    drawResultRows(4, 17, results, selectedIndex, topIndex);
+}
+
+void Interface::refreshSearchSelection(vector<Song>& results, int previousSelectedIndex, int selectedIndex, int topIndex) {
+    int oldVisibleRow = previousSelectedIndex - topIndex;
+    int newVisibleRow = selectedIndex - topIndex;
+
+    if (oldVisibleRow >= 0 && oldVisibleRow < kLibraryVisibleRows && previousSelectedIndex < (int)results.size()) {
+        int y = 17 + oldVisibleRow * 2;
+        Song& song = results[previousSelectedIndex];
+
+        string artist = fitText(song.getAuthor(), 30);
+        string title = fitText(song.getName(), 45);
+        string duration = formatDuration(song.getDuration());
+
+        fillRect(3, y, 117, 1, ' ', 255, 255, 255, BG_R, BG_G, BG_B);
+        writeAt(4, y, artist, SOFT_R, SOFT_G, SOFT_B, BG_R, BG_G, BG_B);
+        writeAt(41, y, title, SOFT_R, SOFT_G, SOFT_B, BG_R, BG_G, BG_B);
+        writeAt(112, y, duration, SOFT_R, SOFT_G, SOFT_B, BG_R, BG_G, BG_B);
+    }
+
+    if (newVisibleRow >= 0 && newVisibleRow < kLibraryVisibleRows && selectedIndex < (int)results.size()) {
+        int y = 17 + newVisibleRow * 2;
+        Song& song = results[selectedIndex];
+
+        string artist = fitText(song.getAuthor(), 30);
+        string title = fitText(song.getName(), 45);
+        string duration = formatDuration(song.getDuration());
+
+        fillRect(3, y, 117, 1, ' ', 255, 255, 255, SELECT_BG_R, SELECT_BG_G, SELECT_BG_B);
+        writeAt(4, y, artist, TITLE_R, TITLE_G, TITLE_B, SELECT_BG_R, SELECT_BG_G, SELECT_BG_B);
+        writeAt(41, y, title, TITLE_R, TITLE_G, TITLE_B, SELECT_BG_R, SELECT_BG_G, SELECT_BG_B);
+        writeAt(112, y, duration, TITLE_R, TITLE_G, TITLE_B, SELECT_BG_R, SELECT_BG_G, SELECT_BG_B);
+    }
+}
+
+void Interface::refreshHudSong(const string& name, const string& artist) {
+    this->fillRect(80, 3, 40, 2, ' ', 22, 24, 37, 22, 24, 37);
+    int center = 196 / 2;
+    int nameX = center - (int)name.size() / 2;
+    int artistX = center - (int)artist.size() / 2;
+    writeAt(nameX, 3, name, TITLE_R, TITLE_G, TITLE_B);
+    writeAt(artistX, 4, artist, SOFT_R, SOFT_G, SOFT_B);
 }
