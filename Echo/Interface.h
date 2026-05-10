@@ -31,6 +31,9 @@ private:
     void drawAlbumArt(int x, int y, const int art[25][25]);
     void getAlbumArtColor(int code, int& r, int& g, int& b);
 
+    // Recibe vector de COPIAS, no punteros
+    void drawResultRows(int x, int y, vector<Song>& results, int selectedIndex, int topIndex);
+
 public:
     Interface() {}
     Interface(int width, int height) : width(width), height(height) {}
@@ -47,8 +50,13 @@ public:
     void displayBackground();
     void drawSpectrum(int x, int y, bool playing);
 
-    //refresh
     void refreshLibrarySelection(MusicLibrary& library, int previousSelectedIndex, int selectedIndex, int topIndex);
-	void refreshHud(MusicLibrary& library, int selectedIndex, int topIndex);
+    void refreshHud(MusicLibrary& library, int selectedIndex, int topIndex);
     void refreshLibraryRows(MusicLibrary& library, int selectedIndex, int topIndex);
+
+    // Metodos para renderizar busqueda (con copias seguras)
+    void displaySearchWithResults(vector<Song>& results, int selectedIndex, int topIndex, const string& query);
+    void refreshSearchRows(vector<Song>& results, int selectedIndex, int topIndex);
+    void refreshSearchSelection(vector<Song>& results, int previousSelectedIndex, int selectedIndex, int topIndex);
+    void refreshHudSong(const string& name, const string& artist);
 };
