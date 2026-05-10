@@ -38,6 +38,9 @@ void AppController::renderRefresh() {
     case Tab::SEARCH:
         ui.refreshSearchRows(searchResults, searchSelectedIndex, searchTopIndex);
         break;
+    case Tab::QUEUE:
+        ui.refreshQueueRows(*musicLib.getSessionHistory(), queueSelectedIndex, queueTopIndex);
+        break;
     default:
         break;
     }
@@ -157,6 +160,7 @@ void AppController::playSelectedSong() {
     else {
         audio.reproducir();
     }
+    musicLib.addToSessionHistory(selectedSong);
     ui.refreshHud(musicLib, librarySelectedIndex, libraryTopIndex);
 }
 
@@ -172,6 +176,48 @@ void AppController::playSelectedSearchSong() {
     else {
         audio.reproducir();
     }
+    musicLib.addToSessionHistory(selectedSong);  
+    ui.refreshHudSong(selectedSong.getName(), selectedSong.getAuthor());
+}
+
+void AppController::moveDownQueue() {
+    Stack<Song>* history = musicLib.getSessionHistory();
+    int totalSongs = static_cast<int>(history->size());
+    if (totalSongs == 0) return;
+    if (queueSelectedIndex < totalSongs - 1) {
+        queueSelectedIndex++;
+        if (queueSelectedIndex >= queueTopIndex + kVisibleLibraryRows) {
+            queueTopIndex++;
+        }
+    }
+}
+
+void AppController::moveUpQueue() {
+    if (queueSelectedIndex > 0) {
+        queueSelectedIndex--;
+        if (queueSelectedIndex < queueTopIndex) {
+            queueTopIndex--;
+        }
+    }
+}
+
+void AppController::playSelectedQueueSong() {
+    if (currentTab != Tab::QUEUE) return;
+    Stack<Song>* history = musicLib.getSessionHistory();
+    if (history->isEmpty()) return;
+    if (queueSelectedIndex >= static_cast<int>(history->size())) return;
+
+    Song selectedSong = history->getAt(queueSelectedIndex);
+    if (audio.getActual() != selectedSong.getSource()) {
+        audio.cerrar();
+        if (audio.cargar(selectedSong.getSource())) {
+            audio.reproducir();
+        }
+    }
+    else {
+        audio.reproducir();
+    }
+    musicLib.addToSessionHistory(selectedSong);
     ui.refreshHudSong(selectedSong.getName(), selectedSong.getAuthor());
 }
 
@@ -184,6 +230,9 @@ void AppController::handleInput() {
         if (currentTab == Tab::SEARCH && !searchResults.empty()) {
             playSelectedSearchSong();
         }
+        else if (currentTab == Tab::QUEUE) {   
+            playSelectedQueueSong();           
+        }
         else {
             playSelectedSong();
         }
@@ -195,7 +244,6 @@ void AppController::handleInput() {
         return;
     }
 
-    // Escritura en SEARCH
     if (currentTab == Tab::SEARCH) {
         if (key == 8) { // Backspace
             if (!searchQuery.empty()) {
@@ -278,6 +326,17 @@ void AppController::handleInput() {
                 ui.refreshSearchSelection(searchResults, previousSelectedIndex, searchSelectedIndex, searchTopIndex);
             }
         }
+        else if (currentTab == Tab::QUEUE) {   
+            int previousSelectedIndex = queueSelectedIndex;
+            int previousTopIndex = queueTopIndex;
+            moveDownQueue();
+            if (queueTopIndex != previousTopIndex) {
+                render("refresh");
+            }
+            else if (queueSelectedIndex != previousSelectedIndex) {
+                ui.refreshQueueSelection(*musicLib.getSessionHistory(), previousSelectedIndex, queueSelectedIndex, queueTopIndex);
+            }
+        }
         break;
     case 72: // Up
         if (currentTab == Tab::LIBRARY) {
@@ -300,6 +359,17 @@ void AppController::handleInput() {
             }
             else if (searchSelectedIndex != previousSelectedIndex) {
                 ui.refreshSearchSelection(searchResults, previousSelectedIndex, searchSelectedIndex, searchTopIndex);
+            }
+            else if (currentTab == Tab::QUEUE) {   
+                int previousSelectedIndex = queueSelectedIndex;
+                int previousTopIndex = queueTopIndex;
+                moveUpQueue();
+                if (queueTopIndex != previousTopIndex) {
+                    render("refresh");
+                }
+                else if (queueSelectedIndex != previousSelectedIndex) {
+                    ui.refreshQueueSelection(*musicLib.getSessionHistory(), previousSelectedIndex, queueSelectedIndex, queueTopIndex);
+                }
             }
         }
         break;
