@@ -16,7 +16,7 @@ AppController::AppController()
 {
     FileManager::loadSongs(musicLib);
     FileManager::loadPlaylists(musicLib);
-    ui.displayMenu(musicLib, librarySelectedIndex, libraryTopIndex);
+    ui.displayMenu(musicLib, librarySelectedIndex, libraryTopIndex, false);
 }
 
 void AppController::render() {
@@ -73,6 +73,7 @@ void AppController::playSelectedSong() {
     else {
         audio.reproducir();
     }
+    ui.refreshHud(musicLib, librarySelectedIndex, libraryTopIndex);
 }
 
 void AppController::handleInput() {
@@ -130,6 +131,7 @@ void AppController::handleInput() {
 
 void AppController::run() {
     while (true) {
-		handleInput(); //// Maneja la entrada del usuario en cada iteracion del loop principal.
+		handleInput(); // Maneja la entrada del usuario en cada iteracion del loop principal.
+		ui.drawSpectrum(130, 50, !audio.estaPausado()); // Dibuja el espectro en la parte inferior de la pantalla.
     }
 }

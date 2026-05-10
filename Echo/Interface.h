@@ -36,18 +36,19 @@ public:
     Interface(int width, int height) : width(width), height(height) {}
     ~Interface() {}
 
-    void displayHud();
+    void displayHud(MusicLibrary& library, int selectedIndex, int topIndex);
     void displayTab();
     void displayQueue();
     void displayPlaylists();
     void displayLibrary(MusicLibrary& library, int selectedIndex, int topIndex);
     void displayArtists();
     void displaySearch();
-    void displayMenu(MusicLibrary& library, int selectedIndex, int topIndex);
+    void displayMenu(MusicLibrary& library, int selectedIndex, int topIndex, bool playing);
     void displayBackground();
-    void drawSpectrum(int x, int y, int frame);
+    void drawSpectrum(int x, int y, bool playing);
 
     //refresh
     void refreshLibrarySelection(MusicLibrary& library, int previousSelectedIndex, int selectedIndex, int topIndex);
+	void refreshHud(MusicLibrary& library, int selectedIndex, int topIndex);
     void refreshLibraryRows(MusicLibrary& library, int selectedIndex, int topIndex);
 };

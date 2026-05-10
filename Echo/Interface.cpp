@@ -265,7 +265,12 @@ void Interface::drawLibraryRows(int x, int y, MusicLibrary& library, int selecte
     }
 }
 
-void Interface::drawSpectrum(int x, int y, int frame) {
+void Interface::drawSpectrum(int x, int y, bool playing) {
+
+    static int frame = 0;
+
+    if (playing) frame++;
+
     vector<vector<int>> colors = {
         {197,120,255}, {188,126,255}, {177,138,255}, {165,152,255}, {152,166,255},
         {140,180,255}, {128,194,255}, {112,206,255}, {92,214,247}, {74,220,240}
@@ -291,7 +296,7 @@ void Interface::drawSpectrum(int x, int y, int frame) {
                 RGB::Write("  ", 0, 0, 0, r, g, b);
             }
             else {
-                RGB::Write("  ", 0, 0, 0, 24, 27, 39);
+                RGB::Write("  ", 24, 27, 39, 22, 24, 37);
             }
         }
     }
@@ -300,16 +305,19 @@ void Interface::drawSpectrum(int x, int y, int frame) {
 void Interface::drawBottomSeekbar(int x, int y, int w) {
     drawBox(x, y, w, 3, PANEL_R, PANEL_G, PANEL_B);
 
-    for (int i = 0; i < w - 2; i++) {
+    int innerWidth = w - 2;
+
+    for (int i = 0; i < innerWidth / 2; i++) {
+
         int r = (i < 100) ? (94 + i) : 34;
         int g = (i < 100) ? 210 : 41;
         int b = (i < 100) ? 176 + (i / 2) : 61;
 
-        System::Console::SetCursorPosition(x + 1 + i, y + 1);
-        RGB::Write(' ', 0, 0, 0, r, g, b);
+        System::Console::SetCursorPosition(x + 1 + (i * 2), y + 1);
+
+        RGB::Write("  ", 0, 0, 0, r, g, b);
     }
 
-    writeAt(x + 98, y + 1, " ", 0, 0, 0, 180, 255, 255);
 }
 
 void Interface::displayBackground() {
@@ -342,14 +350,16 @@ void Interface::displayBackground() {
     }
 }
 
-void Interface::displayHud() {
+void Interface::displayHud(MusicLibrary& library, int selectedIndex, int topIndex) {
     drawBox(2, 1, 196, 6, 170, 176, 204);
+    string name = library.getAllSongs()->getAt(topIndex + selectedIndex).getName();
+    string artist = library.getAllSongs()->getAt(topIndex + selectedIndex).getAuthor();
 
     writeAt(4, 3, "|Playing|", 169, 177, 204);
-    writeAt(4, 4, "2:46 / 5:21", SOFT_R, SOFT_G, SOFT_B);
+    //writeAt(4, 4, "2:46 / 5:21", SOFT_R, SOFT_G, SOFT_B);
 
-    writeAt(87, 3, "I Want You By My Side", TITLE_R, TITLE_G, TITLE_B);
-    writeAt(79, 4, u8"??? - For you, Adroit it but soft", SOFT_R, SOFT_G, SOFT_B);
+    writeAt(87, 3, name, TITLE_R, TITLE_G, TITLE_B);
+    writeAt(83, 4, artist, SOFT_R, SOFT_G, SOFT_B);
 
     writeAt(176, 3, "Volume:", DIM_R, DIM_G, DIM_B);
     drawVolumeBar(184, 3, 5);
@@ -362,6 +372,18 @@ void Interface::displayHud() {
     writeAt(180, 4, "Consume", ACCENT_R, 148, 255);
     writeAt(188, 4, "/", DIM_R, DIM_G, DIM_B);
     writeAt(190, 4, "Single", DIM_R, DIM_G, DIM_B);
+}
+
+void Interface::refreshHud(MusicLibrary& library, int selectedIndex, int topIndex)
+{
+	this->fillRect(80, 3, 40, 2, ' ', 22, 24, 37, 22, 24, 37);
+    string name = library.getAllSongs()->getAt(selectedIndex).getName();
+    string artist = library.getAllSongs()->getAt(selectedIndex).getAuthor();
+    int center = 196 / 2;
+	int nameX = center - name.size() / 2;
+	int artistX = center - artist.size() / 2;
+    writeAt(nameX, 3, name, TITLE_R, TITLE_G, TITLE_B);
+	writeAt(artistX, 4, artist, SOFT_R, SOFT_G, SOFT_B);
 }
 
 void Interface::displayTab() {
@@ -382,11 +404,12 @@ void Interface::displayQueue() {}
 void Interface::displayArtists() {}
 void Interface::displaySearch() {}
 
-void Interface::displayMenu(MusicLibrary& library, int selectedIndex, int topIndex) {
-    displayHud();
+void Interface::displayMenu(MusicLibrary& library, int selectedIndex, int topIndex, bool playing) {
+    displayHud(library, selectedIndex, topIndex);
     displayTab();
     displayLibrary(library, selectedIndex, topIndex);
     drawBottomSeekbar(2, 54, 196);
+	drawSpectrum(130, 50, playing);
 }
 
 void Interface::refreshLibraryRows(MusicLibrary& library, int selectedIndex, int topIndex) {

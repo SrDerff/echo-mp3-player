@@ -64,7 +64,7 @@ private:
     }
 
 public:
-    GestorAudio() : alias(generateAlias()), rutaActual(""), cargado(false), pausado(false), volume(500) {}
+    GestorAudio() : alias(generateAlias()), rutaActual(""), cargado(false), pausado(true), volume(500) {}
 
     ~GestorAudio() {
         cerrar();
@@ -109,12 +109,13 @@ public:
         setVolumen(80);
 
         //cerr << "[OK] Archivo cargado correctamente." << endl;
+        this->pausado = false;
         return true;
     }
 
     void reproducir() {
         if (!cargado) {
-            cerr << "[ERROR] No hay archivo cargado. Usa 'cargar()' primero." << endl;
+            //cerr << "[ERROR] No hay archivo cargado. Usa 'cargar()' primero." << endl;
             return;
         }
 
