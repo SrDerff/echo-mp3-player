@@ -7,11 +7,11 @@
 #include <windows.h>
 
 enum class Tab {
-    LIBRARY,
-    ARTISTS,
-    PLAYLISTS,
-    QUEUE,
-    SEARCH
+    LIBRARY=1,
+    ARTISTS=2,
+    PLAYLISTS=3,
+    QUEUE=4,
+    SEARCH=5
 };
 
 class AppController
@@ -20,6 +20,7 @@ private:
     Interface ui;
     MusicLibrary musicLib;
     Tab currentTab;
+    int currentTabIndex;
     GestorAudio audio;
 
     int librarySelectedIndex;
@@ -30,11 +31,17 @@ private:
 
     int artistsSelectedIndex;
     int artistsTopIndex;
+
+    int queueSelectedIndex;
+    int queueTopIndex;
     
-    void render();
+    void render(string type);
+	void renderRefresh();
+	void renderSwap();
     void handleInput();
     void moveDown();
     void moveUp();
+    void playSelectedSong();
 
 public:
     AppController();
@@ -44,5 +51,4 @@ public:
     AppController& operator=(const AppController&) = delete;
 
     void run();
-    void playSelectedSong();
 };

@@ -127,17 +127,69 @@ void Interface::drawVolumeBar(int x, int y, int level) {
     writeAt(x, y, bar, 245, 166, 84);
 }
 
-void Interface::drawTabs(int x, int y) {
+void Interface::drawTabs(int x, int y, int selectedX) {
     drawBox(x, y, 196, 3, PANEL_R, PANEL_G, PANEL_B);
+    fillRect(x+1, y+1, 194, 1,' ',PANEL_R, PANEL_G, PANEL_B);
 
-    fillRect(x + 63, y + 1, 12, 1, ' ', 255, 255, 255, 40, 58, 78);
-    drawBox(x + 62, y, 14, 3, PANEL_R, PANEL_G, PANEL_B);
-    writeAt(x + 66, y + 1, "Library", TITLE_R, TITLE_G, TITLE_B);
+    if (selectedX == 1) {
+        fillRect(x + 63, y + 1, 12, 1, ' ', 255, 255, 255, 40, 58, 78);
+        drawBox(x + 62, y, 14, 3, PANEL_R, PANEL_G, PANEL_B);
 
-    writeAt(x + 79, y + 1, "Playlists", TEXT_R, TEXT_G, TEXT_B);
-    writeAt(x + 95, y + 1, "Artists", TEXT_R, TEXT_G, TEXT_B);
-    writeAt(x + 110, y + 1, "Queue", TEXT_R, TEXT_G, TEXT_B);
-    writeAt(x + 125, y + 1, "Search", TEXT_R, TEXT_G, TEXT_B);
+        writeAt(x + 66, y + 1, "Library", TITLE_R, TITLE_G, TITLE_B);
+        writeAt(x + 79, y + 1, "Playlists", TEXT_R, TEXT_G, TEXT_B);
+        writeAt(x + 95, y + 1, "Artists", TEXT_R, TEXT_G, TEXT_B);
+        writeAt(x + 110, y + 1, "Queue", TEXT_R, TEXT_G, TEXT_B);
+        writeAt(x + 125, y + 1, "Search", TEXT_R, TEXT_G, TEXT_B);
+    }
+
+    if (selectedX == 2) {
+        writeAt(x + 66, y + 1, "Library", TEXT_R, TEXT_G, TEXT_B);
+
+        fillRect(x + 77, y + 1, 13, 1, ' ', 255, 255, 255, 40, 58, 78);
+        drawBox(x + 76, y, 15, 3, PANEL_R, PANEL_G, PANEL_B);
+
+        writeAt(x + 79, y + 1, "Playlists", TITLE_R, TITLE_G, TITLE_B);
+        writeAt(x + 95, y + 1, "Artists", TEXT_R, TEXT_G, TEXT_B);
+        writeAt(x + 110, y + 1, "Queue", TEXT_R, TEXT_G, TEXT_B);
+        writeAt(x + 125, y + 1, "Search", TEXT_R, TEXT_G, TEXT_B);
+    }
+
+    if (selectedX == 3) {
+        writeAt(x + 66, y + 1, "Library", TEXT_R, TEXT_G, TEXT_B);
+        writeAt(x + 79, y + 1, "Playlists", TEXT_R, TEXT_G, TEXT_B);
+
+        fillRect(x + 93, y + 1, 11, 1, ' ', 255, 255, 255, 40, 58, 78);
+        drawBox(x + 92, y, 13, 3, PANEL_R, PANEL_G, PANEL_B);
+
+        writeAt(x + 95, y + 1, "Artists", TITLE_R, TITLE_G, TITLE_B);
+        writeAt(x + 110, y + 1, "Queue", TEXT_R, TEXT_G, TEXT_B);
+        writeAt(x + 125, y + 1, "Search", TEXT_R, TEXT_G, TEXT_B);
+    }
+
+    if (selectedX == 4) {
+        writeAt(x + 66, y + 1, "Library", TEXT_R, TEXT_G, TEXT_B);
+        writeAt(x + 79, y + 1, "Playlists", TEXT_R, TEXT_G, TEXT_B);
+        writeAt(x + 95, y + 1, "Artists", TEXT_R, TEXT_G, TEXT_B);
+
+        fillRect(x + 108, y + 1, 9, 1, ' ', 255, 255, 255, 40, 58, 78);
+        drawBox(x + 107, y, 11, 3, PANEL_R, PANEL_G, PANEL_B);
+
+        writeAt(x + 110, y + 1, "Queue", TITLE_R, TITLE_G, TITLE_B);
+        writeAt(x + 125, y + 1, "Search", TEXT_R, TEXT_G, TEXT_B);
+    }
+
+    if (selectedX == 5) {
+        writeAt(x + 66, y + 1, "Library", TEXT_R, TEXT_G, TEXT_B);
+        writeAt(x + 79, y + 1, "Playlists", TEXT_R, TEXT_G, TEXT_B);
+        writeAt(x + 95, y + 1, "Artists", TEXT_R, TEXT_G, TEXT_B);
+        writeAt(x + 110, y + 1, "Queue", TEXT_R, TEXT_G, TEXT_B);
+
+        fillRect(x + 123, y + 1, 10, 1, ' ', 255, 255, 255, 40, 58, 78);
+        drawBox(x + 122, y, 12, 3, PANEL_R, PANEL_G, PANEL_B);
+
+        writeAt(x + 125, y + 1, "Search", TITLE_R, TITLE_G, TITLE_B);
+    }
+   
 }
 
 void Interface::drawTableHeader(int x, int y) {
@@ -387,29 +439,30 @@ void Interface::refreshHud(MusicLibrary& library, int selectedIndex, int topInde
 }
 
 void Interface::displayTab() {
-    drawTabs(2, 8);
+    drawTabs(2, 8, 1);
 }
 
 void Interface::displayLibrary(MusicLibrary& library, int selectedIndex, int topIndex) {
+    drawTabs(2, 8, 1);
     drawBox(2, 12, 196, 40, PANEL_R, PANEL_G, PANEL_B);
     drawTableHeader(4, 14);
     drawLibraryRows(4, 17, library, selectedIndex, topIndex);
-
     vLine(121, 13, 38, '|', PANEL_R, PANEL_G, PANEL_B);
     drawRightPanelPlaceholder(131, 13, 58, 31);
 }
 
-void Interface::displayPlaylists() {}
-void Interface::displayQueue() {}
-void Interface::displayArtists() {}
-void Interface::displaySearch() {}
+void Interface::displayPlaylists(MusicLibrary& library, int selectedIndex, int topIndex) {
+    drawTabs(2, 8, 2);
 
-void Interface::displayMenu(MusicLibrary& library, int selectedIndex, int topIndex, bool playing) {
-    displayHud(library, selectedIndex, topIndex);
-    displayTab();
-    displayLibrary(library, selectedIndex, topIndex);
-    drawBottomSeekbar(2, 54, 196);
-	drawSpectrum(130, 50, playing);
+}
+void Interface::displayArtists(MusicLibrary& library, int selectedIndex, int topIndex) {
+    drawTabs(2, 8, 3);
+}
+void Interface::displayQueue(MusicLibrary& library, int selectedIndex, int topIndex) {
+    drawTabs(2, 8, 4);
+}
+void Interface::displaySearch(MusicLibrary& library, int selectedIndex, int topIndex) {
+    drawTabs(2, 8, 5);
 }
 
 void Interface::refreshLibraryRows(MusicLibrary& library, int selectedIndex, int topIndex) {
@@ -455,4 +508,11 @@ void Interface::refreshLibrarySelection(MusicLibrary& library, int previousSelec
         curr = curr->next;
         index++;
     }
+}
+
+void Interface::displayMenu(MusicLibrary& library, int selectedIndex, int topIndex, bool playing) {
+    displayHud(library, selectedIndex, topIndex);
+    displayLibrary(library, selectedIndex, topIndex);
+    drawBottomSeekbar(2, 54, 196);
+    drawSpectrum(130, 50, playing);
 }

@@ -21,7 +21,7 @@ private:
     void drawBox(int x, int y, int w, int h, int fr, int fg, int fb);
     void drawProgressBar(int x, int y, int w);
     void drawVolumeBar(int x, int y, int level);
-    void drawTabs(int x, int y);
+    void drawTabs(int x, int y, int selectedX);
     void drawTableHeader(int x, int y);
     void drawLibraryRows(int x, int y, MusicLibrary& library, int selectedIndex, int topIndex);
     void drawQueueRows(int x, int y);
@@ -38,11 +38,11 @@ public:
 
     void displayHud(MusicLibrary& library, int selectedIndex, int topIndex);
     void displayTab();
-    void displayQueue();
-    void displayPlaylists();
+    void displayQueue(MusicLibrary& library, int selectedIndex, int topIndex);
+    void displayPlaylists(MusicLibrary& library, int selectedIndex, int topIndex);
     void displayLibrary(MusicLibrary& library, int selectedIndex, int topIndex);
-    void displayArtists();
-    void displaySearch();
+    void displayArtists(MusicLibrary& library, int selectedIndex, int topIndex);
+    void displaySearch(MusicLibrary& library, int selectedIndex, int topIndex);
     void displayMenu(MusicLibrary& library, int selectedIndex, int topIndex, bool playing);
     void displayBackground();
     void drawSpectrum(int x, int y, bool playing);
