@@ -54,6 +54,11 @@ public:
     void refreshHud(MusicLibrary& library, int selectedIndex, int topIndex);
     void refreshLibraryRows(MusicLibrary& library, int selectedIndex, int topIndex);
 
+    //Para lo de queue
+	void displayQueueSongs(Stack<Song>& library, int selectedIndex, int topIndex);
+	void refreshQueueRows(Stack<Song>& library, int selectedIndex, int topIndex);
+	void refreshQueueSelection(Stack<Song>& library, int previousSelectedIndex, int selectedIndex, int topIndex);
+
     // Metodos para renderizar busqueda (con copias seguras)
     void displaySearchWithResults(vector<Song>& results, int selectedIndex, int topIndex, const string& query);
     void refreshSearchRows(vector<Song>& results, int selectedIndex, int topIndex);
