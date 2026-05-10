@@ -5,13 +5,17 @@
 #include "GestorAudio.h"
 #include <conio.h>
 #include <windows.h>
+#include <vector>
+#include <string>
+
+using namespace std;
 
 enum class Tab {
-    LIBRARY=1,
-    ARTISTS=2,
-    PLAYLISTS=3,
-    QUEUE=4,
-    SEARCH=5
+    LIBRARY = 1,
+    ARTISTS = 2,
+    PLAYLISTS = 3,
+    QUEUE = 4,
+    SEARCH = 5
 };
 
 class AppController
@@ -34,14 +38,26 @@ private:
 
     int queueSelectedIndex;
     int queueTopIndex;
-    
+
+    // Estado de busqueda (copias seguras, no punteros)
+    vector<Song> searchResults;
+    string searchQuery;
+    int searchSelectedIndex;
+    int searchTopIndex;
+
     void render(string type);
-	void renderRefresh();
-	void renderSwap();
+    void renderRefresh();
+    void renderSwap();
     void handleInput();
     void moveDown();
     void moveUp();
     void playSelectedSong();
+
+    // Helpers de busqueda
+    void moveDownSearch();
+    void moveUpSearch();
+    void performSearch();
+    void playSelectedSearchSong();
 
 public:
     AppController();
