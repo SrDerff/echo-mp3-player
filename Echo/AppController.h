@@ -45,7 +45,7 @@ private:
 
 public:
     AppController();
-    ~AppController() = default;
+    ~AppController();
 
     AppController(const AppController&) = delete;
     AppController& operator=(const AppController&) = delete;

@@ -166,6 +166,52 @@ public:
         return songTrie.searchPrefix(toLowerStr(prefix));
     }
 
+    vector<Song> getAllSongsVector() {
+        vector<Song> songs;
+        Node<Song>* curr = allSongs.getHead();
+
+        while (curr != nullptr) {
+            songs.push_back(curr->getValue());
+            curr = curr->next;
+        }
+
+        return songs;
+    }
+
+    void createDailyPlaylist() {
+        if (playlists.size() >= 5) {
+            cout << "Ya tienes 5 playlists.\n";
+            return;
+        }
+
+        vector<Song> all = getAllSongsVector();
+        if (all.empty()) {
+            cout << "No hay canciones en la biblioteca.\n";
+            return;
+        }
+
+        addPlaylist("Daily Mix");
+        Playlist* p = getPlaylist(getPlaylistCount() - 1);
+
+        if (!p) return;
+
+        srand(time(nullptr));
+
+        for (int i = static_cast<int>(all.size()) - 1; i > 0; --i) {
+            int j = rand() % (i + 1);
+            swap(all[i], all[j]);
+        }
+
+        size_t limit = min(size_t(10), all.size());
+
+        for (size_t i = 0; i < limit; ++i) {
+            p->addSong(all[i]);
+        }
+
+        cout << "Daily Mix creada con " << limit << " canciones.\n";
+    }
+
+
     void relateArtists(const string& artist1, const string& artist2) {
         artistGraph.addEdge(artist1, artist2);
     }

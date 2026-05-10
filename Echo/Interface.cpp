@@ -192,11 +192,19 @@ void Interface::drawTabs(int x, int y, int selectedX) {
    
 }
 
-void Interface::drawTableHeader(int x, int y) {
-    writeAt(x, y, "Artist", 71, 136, 182);
-    writeAt(x + 52, y, "Title", 71, 136, 182);
-    writeAt(x + 103, y, "Duration", 71, 136, 182);
-    hLine(x, y + 1, 116, '-', PANEL_R, PANEL_G, PANEL_B);
+void Interface::drawTableHeader(int x, int y, int selectedTab) {
+    if (selectedTab == 1) {
+        writeAt(x, y, "Artist", 71, 136, 182);
+        writeAt(x + 52, y, "Title", 71, 136, 182);
+        writeAt(x + 103, y, "Duration", 71, 136, 182);
+        hLine(x, y + 1, 116, '-', PANEL_R, PANEL_G, PANEL_B);
+    }
+    else if (selectedTab == 2) {
+        writeAt(x, y, "User  ", 71, 136, 182);
+        writeAt(x + 52, y, "Title", 71, 136, 182);
+        writeAt(x + 103, y, "Count", 71, 136, 182);
+        hLine(x, y + 1, 116, '-', PANEL_R, PANEL_G, PANEL_B);
+    }
 }
 
 void Interface::drawQueueRows(int x, int y) {
@@ -317,6 +325,53 @@ void Interface::drawLibraryRows(int x, int y, MusicLibrary& library, int selecte
     }
 }
 
+void Interface::drawPlaylistsRows(int x, int y, MusicLibrary& library, int selectedIndex, int topIndex) {
+    int currentIndex = topIndex;
+    int drawnRows = 0;
+
+    while (currentIndex < library.getPlaylistCount() && drawnRows < kLibraryVisibleRows) {
+        Playlist* playlist = library.getPlaylist(currentIndex);
+        if (playlist == nullptr) break;
+
+        int yy = y + drawnRows * 2;
+        bool selected = (currentIndex == selectedIndex);
+
+        string user = "You";
+        string title = fitText(playlist->getName(), 45);
+        string count = to_string(playlist->getSize());
+
+        fillRect(x - 1, yy, 117, 1, ' ', 255, 255, 255,
+            selected ? SELECT_BG_R : BG_R,
+            selected ? SELECT_BG_G : BG_G,
+            selected ? SELECT_BG_B : BG_B);
+
+        if (selected) {
+            writeAt(x, yy, user, TITLE_R, TITLE_G, TITLE_B, SELECT_BG_R, SELECT_BG_G, SELECT_BG_B);
+            writeAt(x + 37, yy, title, TITLE_R, TITLE_G, TITLE_B, SELECT_BG_R, SELECT_BG_G, SELECT_BG_B);
+            writeAt(x + 108, yy, count, TITLE_R, TITLE_G, TITLE_B, SELECT_BG_R, SELECT_BG_G, SELECT_BG_B);
+        }
+        else {
+            writeAt(x, yy, user, SOFT_R, SOFT_G, SOFT_B, BG_R, BG_G, BG_B);
+            writeAt(x + 37, yy, title, SOFT_R, SOFT_G, SOFT_B, BG_R, BG_G, BG_B);
+            writeAt(x + 108, yy, count, SOFT_R, SOFT_G, SOFT_B, BG_R, BG_G, BG_B);
+        }
+
+        currentIndex++;
+        drawnRows++;
+    }
+
+    if (drawnRows == 0) {
+        writeAt(x, y, "No hay playlists creadas.", DIM_R, DIM_G, DIM_B);
+        return;
+    }
+
+    while (drawnRows < kLibraryVisibleRows) {
+        int yy = y + drawnRows * 2;
+        fillRect(x - 1, yy, 117, 1, ' ', 255, 255, 255, BG_R, BG_G, BG_B);
+        drawnRows++;
+    }
+}
+
 void Interface::drawSpectrum(int x, int y, bool playing) {
 
     static int frame = 0;
@@ -426,18 +481,6 @@ void Interface::displayHud(MusicLibrary& library, int selectedIndex, int topInde
     writeAt(190, 4, "Single", DIM_R, DIM_G, DIM_B);
 }
 
-void Interface::refreshHud(MusicLibrary& library, int selectedIndex, int topIndex)
-{
-	this->fillRect(80, 3, 40, 2, ' ', 22, 24, 37, 22, 24, 37);
-    string name = library.getAllSongs()->getAt(selectedIndex).getName();
-    string artist = library.getAllSongs()->getAt(selectedIndex).getAuthor();
-    int center = 196 / 2;
-	int nameX = center - name.size() / 2;
-	int artistX = center - artist.size() / 2;
-    writeAt(nameX, 3, name, TITLE_R, TITLE_G, TITLE_B);
-	writeAt(artistX, 4, artist, SOFT_R, SOFT_G, SOFT_B);
-}
-
 void Interface::displayTab() {
     drawTabs(2, 8, 1);
 }
@@ -445,7 +488,7 @@ void Interface::displayTab() {
 void Interface::displayLibrary(MusicLibrary& library, int selectedIndex, int topIndex) {
     drawTabs(2, 8, 1);
     drawBox(2, 12, 196, 40, PANEL_R, PANEL_G, PANEL_B);
-    drawTableHeader(4, 14);
+    drawTableHeader(4, 14, 1);
     drawLibraryRows(4, 17, library, selectedIndex, topIndex);
     vLine(121, 13, 38, '|', PANEL_R, PANEL_G, PANEL_B);
     drawRightPanelPlaceholder(131, 13, 58, 31);
@@ -453,8 +496,13 @@ void Interface::displayLibrary(MusicLibrary& library, int selectedIndex, int top
 
 void Interface::displayPlaylists(MusicLibrary& library, int selectedIndex, int topIndex) {
     drawTabs(2, 8, 2);
+    drawBox(2, 12, 196, 40, PANEL_R, PANEL_G, PANEL_B);
+    drawTableHeader(4, 14, 2);
+    drawPlaylistsRows(4, 17, library, selectedIndex, topIndex);
 
+    vLine(121, 13, 38, '|', PANEL_R, PANEL_G, PANEL_B);
 }
+
 void Interface::displayArtists(MusicLibrary& library, int selectedIndex, int topIndex) {
     drawTabs(2, 8, 3);
 }
@@ -463,6 +511,48 @@ void Interface::displayQueue(MusicLibrary& library, int selectedIndex, int topIn
 }
 void Interface::displaySearch(MusicLibrary& library, int selectedIndex, int topIndex) {
     drawTabs(2, 8, 5);
+}
+void Interface::displayConsole() {
+    drawBox(2, 52, 196, 5, PANEL_R, PANEL_G, PANEL_B);
+	writeAt(4, 53, "Waiting for input..", DIM_R, DIM_G, DIM_B);
+}
+void Interface::displayHelp() {
+    // [Enter]
+    writeAt(110, 53, "[Enter]", ACCENT_R, 148, 255);
+    writeAt(117, 53, ": Reproducir / Entrar", 220, 220, 220);
+
+    // [Espacio]
+    writeAt(142, 53, "[Espacio]", ACCENT_R, 148, 255);
+    writeAt(150, 53, ": Pausar / Reanudar", 220, 220, 220);
+
+    // [+]
+    writeAt(172, 53, "[+]", ACCENT_R, 148, 255);
+    writeAt(175, 53, ": Agregar a playlist", 220, 220, 220);
+
+    // [-]
+    writeAt(110, 55, "[-]", ACCENT_R, 148, 255);
+    writeAt(113, 55, ": Eliminar de playlist", 220, 220, 220);
+
+    // [Flechas]
+    writeAt(142, 55, "[Flechas]", ACCENT_R, 148, 255);
+    writeAt(150, 55, ": Desplazarse", 220, 220, 220);
+
+    // [Esc]
+    writeAt(172, 55, "[Esc]", ACCENT_R, 148, 255);
+    writeAt(175, 55, ": Retroceder / Salir", 220, 220, 220);
+}
+
+
+void Interface::refreshHud(MusicLibrary& library, int selectedIndex, int topIndex)
+{
+    this->fillRect(80, 3, 40, 2, ' ', 22, 24, 37, 22, 24, 37);
+    string name = library.getAllSongs()->getAt(selectedIndex).getName();
+    string artist = library.getAllSongs()->getAt(selectedIndex).getAuthor();
+    int center = 196 / 2;
+    int nameX = center - name.size() / 2;
+    int artistX = center - artist.size() / 2;
+    writeAt(nameX, 3, name, TITLE_R, TITLE_G, TITLE_B);
+    writeAt(artistX, 4, artist, SOFT_R, SOFT_G, SOFT_B);
 }
 
 void Interface::refreshLibraryRows(MusicLibrary& library, int selectedIndex, int topIndex) {
@@ -513,6 +603,8 @@ void Interface::refreshLibrarySelection(MusicLibrary& library, int previousSelec
 void Interface::displayMenu(MusicLibrary& library, int selectedIndex, int topIndex, bool playing) {
     displayHud(library, selectedIndex, topIndex);
     displayLibrary(library, selectedIndex, topIndex);
-    drawBottomSeekbar(2, 54, 196);
+    displayConsole();
+    displayHelp();
+    drawBottomSeekbar(2, 57, 196);
     drawSpectrum(130, 50, playing);
 }

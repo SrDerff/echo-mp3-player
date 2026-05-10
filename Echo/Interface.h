@@ -22,15 +22,15 @@ private:
     void drawProgressBar(int x, int y, int w);
     void drawVolumeBar(int x, int y, int level);
     void drawTabs(int x, int y, int selectedX);
-    void drawTableHeader(int x, int y);
+    void drawTableHeader(int x, int y, int selectedTab);
     void drawLibraryRows(int x, int y, MusicLibrary& library, int selectedIndex, int topIndex);
     void drawQueueRows(int x, int y);
+    void drawPlaylistsRows(int x, int y, MusicLibrary& library, int selectedIndex, int topIndex);
     void drawRightPanelPlaceholder(int x, int y, int w, int h);
 
     void drawBottomSeekbar(int x, int y, int w);
     void drawAlbumArt(int x, int y, const int art[25][25]);
     void getAlbumArtColor(int code, int& r, int& g, int& b);
-
 public:
     Interface() {}
     Interface(int width, int height) : width(width), height(height) {}
@@ -46,9 +46,11 @@ public:
     void displayMenu(MusicLibrary& library, int selectedIndex, int topIndex, bool playing);
     void displayBackground();
     void drawSpectrum(int x, int y, bool playing);
+    void displayHelp();
 
     //refresh
     void refreshLibrarySelection(MusicLibrary& library, int previousSelectedIndex, int selectedIndex, int topIndex);
 	void refreshHud(MusicLibrary& library, int selectedIndex, int topIndex);
     void refreshLibraryRows(MusicLibrary& library, int selectedIndex, int topIndex);
+    void displayConsole();
 };

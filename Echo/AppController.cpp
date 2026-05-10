@@ -19,7 +19,13 @@ AppController::AppController()
 {
     FileManager::loadSongs(musicLib);
     FileManager::loadPlaylists(musicLib);
+    musicLib.createDailyPlaylist();
     ui.displayMenu(musicLib, librarySelectedIndex, libraryTopIndex, false);
+}
+
+AppController::~AppController() {
+	FileManager::saveSongs(musicLib);
+	FileManager::savePlaylists(musicLib);
 }
 
 void AppController::renderRefresh() {
@@ -95,12 +101,15 @@ void AppController::handleInput() {
     if (!_kbhit()) return;
 
     int key = _getch();
-
+    if(key== 27) { // Escape
+        FileManager::savePlaylists(musicLib);
+        exit(0);
+	}
     if (key == 13) { // Enter
         playSelectedSong();
         return;
     }
-    else if (key== 32) { // Escape
+    else if (key== 32) { // Espacio
         if (!audio.estaPausado()) audio.pausar();
         else audio.reproducir();
         return;

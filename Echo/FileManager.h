@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <ctime>
 
 using namespace std;
 
@@ -15,15 +16,15 @@ private:
         return str.substr(first, last - first + 1);
     }
 
-    static Song* findSongBySource(MusicLibrary& lib, const string& source) {
+    static Song findSongBySource(MusicLibrary& lib, const string& source) {
         Node<Song>* curr = lib.getAllSongs()->getHead();
         while (curr != nullptr) {
             if (curr->getValue().getSource() == source) {
-                return &(curr->getValue());
+                return curr->getValue();
             }
             curr = curr->next;
         }
-        return nullptr;
+        return Song();
     }
 
 public:
@@ -100,7 +101,7 @@ public:
 
         string line;
         int currentPlaylistIndex = -1;
-
+        vector<string>names;
         while (getline(file, line)) {
             if (!line.empty() && line.back() == '\r') line.pop_back();
             line = trim(line);
@@ -112,14 +113,24 @@ public:
             }
 
             if (currentPlaylistIndex == -1) {
+                if (names.size() > 0) {
+                    for (auto x : names) {
+                        if(x==line || line=="Daily Mix") {
+                            file.close();
+                            return false;
+						}
+                    }
+                }
                 lib.addPlaylist(line);
+                names.push_back(line);
                 currentPlaylistIndex = lib.getPlaylistCount() - 1;
                 continue;
             }
 
-            Song* song = findSongBySource(lib, line);
-            if (song != nullptr) {
-                lib.addSongToPlaylist(currentPlaylistIndex, *song);
+            Song song = findSongBySource(lib, line);
+             
+            if (song != Song()) {
+                lib.addSongToPlaylist(currentPlaylistIndex, song);
             }
         }
 
@@ -134,7 +145,7 @@ public:
         for (int i = 0; i < lib.getPlaylistCount(); i++) {
             Playlist* p = const_cast<MusicLibrary&>(lib).getPlaylist(i);
             if (p == nullptr) continue;
-
+			if (p->getName() == "Daily Mix") continue; // No guardamos la Daily Mix
             file << p->getName() << "\n";
             for (uint j = 0; j < p->getSize(); j++) {
                 Song s = p->getSongAt(j);
