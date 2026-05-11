@@ -33,6 +33,10 @@ private:
     void drawBottomSeekbar(int x, int y, int w);
     void drawAlbumArt(int x, int y, const int art[25][25]);
     void getAlbumArtColor(int code, int& r, int& g, int& b);
+
+    // Recibe vector de COPIAS, no punteros
+    void drawResultRows(int x, int y, vector<Song>& results, int selectedIndex, int topIndex);
+
 public:
     Interface() {}
     Interface(int width, int height) : width(width), height(height) {}
@@ -51,10 +55,20 @@ public:
     void drawSpectrum(int x, int y, bool playing);
     void displayHelp();
 
-    //refresh
     void refreshLibrarySelection(MusicLibrary& library, int previousSelectedIndex, int selectedIndex, int topIndex);
-	void refreshHud(MusicLibrary& library, int selectedIndex, int topIndex);
+    void refreshHud(MusicLibrary& library, int selectedIndex, int topIndex);
     void refreshLibraryRows(MusicLibrary& library, int selectedIndex, int topIndex);
+
+    //Para lo de queue
+	void displayQueueSongs(Stack<Song>& library, int selectedIndex, int topIndex);
+	void refreshQueueRows(Stack<Song>& library, int selectedIndex, int topIndex);
+	void refreshQueueSelection(Stack<Song>& library, int previousSelectedIndex, int selectedIndex, int topIndex);
+
+    // Metodos para renderizar busqueda (con copias seguras)
+    void displaySearchWithResults(vector<Song>& results, int selectedIndex, int topIndex, const string& query);
+    void refreshSearchRows(vector<Song>& results, int selectedIndex, int topIndex);
+    void refreshSearchSelection(vector<Song>& results, int previousSelectedIndex, int selectedIndex, int topIndex);
+    void refreshHudSong(const string& name, const string& artist);
 	void refreshPlaylistRows(MusicLibrary& lib, int selectedIndex, int topIndex);
 	void refreshPlaylistSongsRows(Playlist* playlist, int selectedIndex, int topIndex);
     void refreshPlaylistSongsSelection(Playlist* playlist, int previousSelectedIndex, int selectedIndex, int topIndex);

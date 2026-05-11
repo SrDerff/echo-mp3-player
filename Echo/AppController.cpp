@@ -4,6 +4,12 @@ namespace {
     constexpr int kVisibleLibraryRows = 17;
 }
 
+
+static string toLowerStr(string str) {
+    for (char& c : str) c = static_cast<char>(tolower(static_cast<unsigned char>(c)));
+    return str;
+}
+
 AppController::AppController()
     : ui(100, 60),
       currentTab(Tab::LIBRARY),
@@ -48,8 +54,12 @@ void AppController::renderRefresh() {
         }
 		break;
     case Tab::ARTISTS:
-    case Tab::QUEUE:
     case Tab::SEARCH:
+        ui.refreshSearchRows(searchResults, searchSelectedIndex, searchTopIndex);
+        break;
+    case Tab::QUEUE:
+        ui.refreshQueueRows(*musicLib.getSessionHistory(), queueSelectedIndex, queueTopIndex);
+        break;
     default:
         ui.refreshLibraryRows(musicLib, librarySelectedIndex, libraryTopIndex);
         break;
@@ -76,10 +86,10 @@ void AppController::renderSwap() {
         break;
     case Tab::QUEUE:
         ui.displayQueue(musicLib, queueSelectedIndex, queueTopIndex);
-		break;
+        break;
     case Tab::SEARCH:
-        ui.displaySearch(musicLib, playlistsSelectedIndex, playlistsTopIndex); //parametros para corregir
-		break;  
+        ui.displaySearchWithResults(searchResults, searchSelectedIndex, searchTopIndex, searchQuery);
+        break;
     }
 }
 
@@ -137,36 +147,6 @@ void AppController::moveDown() {
             }
         }
     }
-    /*else if (currentTab == Tab::ARTISTS) {
-        const int totalArtists = static_cast<int>(musicLib.getArtists().size());
-        if (totalArtists == 0) return;
-        if (artistsSelectedIndex < totalArtists - 1) {
-            artistsSelectedIndex++;
-            if (artistsSelectedIndex >= artistsTopIndex + kVisibleLibraryRows) {
-                artistsTopIndex++;
-            }
-        }
-    }
-    else if (currentTab == Tab::QUEUE) {
-        const int totalQueueSongs = static_cast<int>(musicLib.getPlaybackHistory().getSize());
-        if (totalQueueSongs == 0) return;
-        if (queueSelectedIndex < totalQueueSongs - 1) {
-            queueSelectedIndex++;
-            if (queueSelectedIndex >= queueTopIndex + kVisibleLibraryRows) {
-                queueTopIndex++;
-            }
-        }
-    }
-    else if (currentTab == Tab::SEARCH) {
-        const int totalSearchResults = static_cast<int>(musicLib.getSearchResults().size());
-        if (totalSearchResults == 0) return;
-        if (searchSelectedIndex < totalSearchResults - 1) {
-            searchSelectedIndex++;
-            if (searchSelectedIndex >= searchTopIndex + kVisibleLibraryRows) {
-                searchTopIndex++;
-            }
-        }
-    }*/
 }
 
 void AppController::moveUp() {
@@ -206,6 +186,114 @@ void AppController::moveUp() {
             }
         }
     }
+}
+
+void AppController::moveDownSearch() {
+    if (searchResults.empty()) return;
+    if (searchSelectedIndex < static_cast<int>(searchResults.size()) - 1) {
+        searchSelectedIndex++;
+        if (searchSelectedIndex >= searchTopIndex + kVisibleLibraryRows) {
+            searchTopIndex++;
+        }
+    }
+}
+
+void AppController::moveUpSearch() {
+    if (searchResults.empty()) return;
+    if (searchSelectedIndex > 0) {
+        searchSelectedIndex--;
+        if (searchSelectedIndex < searchTopIndex) {
+            searchTopIndex--;
+        }
+    }
+}
+
+void AppController::performSearch() {
+    searchResults.clear();
+    string lowerQuery = toLowerStr(searchQuery);
+
+    Node<Song>* curr = musicLib.getAllSongs()->getHead();
+    while (curr != nullptr) {
+        Song song = curr->getValue(); // copia segura
+
+        bool match = false;
+        if (searchQuery.empty()) {
+            match = true;
+        }
+        else {
+            string lowerName = toLowerStr(song.getName());
+            string lowerArtist = toLowerStr(song.getAuthor());
+            if (lowerName.find(lowerQuery) != string::npos ||
+                lowerArtist.find(lowerQuery) != string::npos) {
+                match = true;
+            }
+        }
+
+        if (match) {
+            searchResults.push_back(song); // copia al vector
+        }
+        curr = curr->next;
+    }
+
+    searchSelectedIndex = 0;
+    searchTopIndex = 0;
+}
+
+void AppController::playSelectedSearchSong() {
+    if (currentTab != Tab::SEARCH || searchResults.empty()) return;
+    Song& selectedSong = searchResults[searchSelectedIndex];
+    if (audio.getActual() != selectedSong.getSource()) {
+        audio.cerrar();
+        if (audio.cargar(selectedSong.getSource())) {
+            audio.reproducir();
+        }
+    }
+    else {
+        audio.reproducir();
+    }
+    musicLib.addToSessionHistory(selectedSong);
+    ui.refreshHudSong(selectedSong.getName(), selectedSong.getAuthor());
+}
+
+void AppController::moveDownQueue() {
+    Stack<Song>* history = musicLib.getSessionHistory();
+    int totalSongs = static_cast<int>(history->size());
+    if (totalSongs == 0) return;
+    if (queueSelectedIndex < totalSongs - 1) {
+        queueSelectedIndex++;
+        if (queueSelectedIndex >= queueTopIndex + kVisibleLibraryRows) {
+            queueTopIndex++;
+        }
+    }
+}
+
+void AppController::moveUpQueue() {
+    if (queueSelectedIndex > 0) {
+        queueSelectedIndex--;
+        if (queueSelectedIndex < queueTopIndex) {
+            queueTopIndex--;
+        }
+    }
+}
+
+void AppController::playSelectedQueueSong() {
+    if (currentTab != Tab::QUEUE) return;
+    Stack<Song>* history = musicLib.getSessionHistory();
+    if (history->isEmpty()) return;
+    if (queueSelectedIndex >= static_cast<int>(history->size())) return;
+
+    Song selectedSong = history->getAt(queueSelectedIndex);
+    if (audio.getActual() != selectedSong.getSource()) {
+        audio.cerrar();
+        if (audio.cargar(selectedSong.getSource())) {
+            audio.reproducir();
+        }
+    }
+    else {
+        audio.reproducir();
+    }
+    musicLib.addToSessionHistory(selectedSong);
+    ui.refreshHudSong(selectedSong.getName(), selectedSong.getAuthor());
 }
 
 void AppController::handleInput() {
@@ -268,6 +356,12 @@ void AppController::handleInput() {
                 playSelectedPlaylistSong();
             }
         }
+        else if (currentTab == Tab::SEARCH && !searchResults.empty()) {
+            playSelectedSearchSong();
+        }
+        else if (currentTab == Tab::QUEUE) {
+            playSelectedQueueSong();
+        }
 
         return;
     }
@@ -276,6 +370,23 @@ void AppController::handleInput() {
         else audio.reproducir();
         return;
 	}
+
+    if (currentTab == Tab::SEARCH) {
+        if (key == 8) { // Backspace
+            if (!searchQuery.empty()) {
+                searchQuery.pop_back();
+                performSearch();
+                render("swap");
+            }
+            return;
+        }
+        if (key >= 32 && key <= 126) {
+            searchQuery += static_cast<char>(key);
+            performSearch();
+            render("swap");
+            return;
+        }
+    }
 
     if (key != 224) return;
     key = _getch();
@@ -287,16 +398,16 @@ void AppController::handleInput() {
 			currentTab = Tab::LIBRARY;
             render("swap");
         }
-        else if(currentTab == Tab::ARTISTS) {
-			currentTab = Tab::PLAYLISTS;
+        else if (currentTab == Tab::ARTISTS) {
+            currentTab = Tab::PLAYLISTS;
             render("swap");
         }
-        else if(currentTab == Tab::QUEUE) {
-			currentTab = Tab::ARTISTS;
+        else if (currentTab == Tab::QUEUE) {
+            currentTab = Tab::ARTISTS;
             render("swap");
         }
-        else if(currentTab == Tab::SEARCH) {
-			currentTab = Tab::QUEUE;
+        else if (currentTab == Tab::SEARCH) {
+            currentTab = Tab::QUEUE;
             render("swap");
         }
 		break;
@@ -399,6 +510,28 @@ void AppController::handleInput() {
             }
         }
 
+        else if (currentTab == Tab::SEARCH) {
+            int previousSelectedIndex = searchSelectedIndex;
+            int previousTopIndex = searchTopIndex;
+            moveDownSearch();
+            if (searchTopIndex != previousTopIndex) {
+                render("refresh");
+            }
+            else if (searchSelectedIndex != previousSelectedIndex) {
+                ui.refreshSearchSelection(searchResults, previousSelectedIndex, searchSelectedIndex, searchTopIndex);
+            }
+        }
+        else if (currentTab == Tab::QUEUE) {
+            int previousSelectedIndex = queueSelectedIndex;
+            int previousTopIndex = queueTopIndex;
+            moveDownQueue();
+            if (queueTopIndex != previousTopIndex) {
+                render("refresh");
+            }
+            else if (queueSelectedIndex != previousSelectedIndex) {
+                ui.refreshQueueSelection(*musicLib.getSessionHistory(), previousSelectedIndex, queueSelectedIndex, queueTopIndex);
+            }
+        }
         break;
     }
     case 72: {
@@ -483,7 +616,29 @@ void AppController::handleInput() {
                 );
             }
         }
-
+        else if (currentTab == Tab::SEARCH) {
+            int previousSelectedIndex = searchSelectedIndex;
+            int previousTopIndex = searchTopIndex;
+            moveUpSearch();
+            if (searchTopIndex != previousTopIndex) {
+                render("refresh");
+            }
+            else if (searchSelectedIndex != previousSelectedIndex) {
+                ui.refreshSearchSelection(searchResults, previousSelectedIndex, searchSelectedIndex, searchTopIndex);
+            }
+            else if (currentTab == Tab::QUEUE) {
+                int previousSelectedIndex = queueSelectedIndex;
+                int previousTopIndex = queueTopIndex;
+                moveUpQueue();
+                if (queueTopIndex != previousTopIndex) {
+                    render("refresh");
+                }
+                else if (queueSelectedIndex != previousSelectedIndex) {
+                    ui.refreshQueueSelection(*musicLib.getSessionHistory(), previousSelectedIndex, queueSelectedIndex, queueTopIndex);
+                }
+            }
+        }
+        break;
         break;
     }
     default:
