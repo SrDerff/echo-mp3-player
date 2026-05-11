@@ -29,6 +29,12 @@ private:
     int playlistsSelectedIndex;
     int playlistsTopIndex;
 
+    bool insidePlaylist;
+    int openedPlaylistIndex;
+
+    int playlistSongsSelectedIndex;
+    int playlistSongsTopIndex;
+
     int artistsSelectedIndex;
     int artistsTopIndex;
 
@@ -42,6 +48,10 @@ private:
     void moveDown();
     void moveUp();
     void playSelectedSong();
+    void playSelectedPlaylistSong();
+    void addSelectedSongToPlaylist();
+    void removeSelectedSongFromPlaylist();
+    string captureTextInput(const string& prompt);
 
 public:
     AppController();

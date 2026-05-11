@@ -486,6 +486,7 @@ void Interface::displayTab() {
 }
 
 void Interface::displayLibrary(MusicLibrary& library, int selectedIndex, int topIndex) {
+    fillRect(3, 13, 118, 38, ' ', PANEL_R, PANEL_G, PANEL_B);
     drawTabs(2, 8, 1);
     drawBox(2, 12, 196, 40, PANEL_R, PANEL_G, PANEL_B);
     drawTableHeader(4, 14, 1);
@@ -495,12 +496,151 @@ void Interface::displayLibrary(MusicLibrary& library, int selectedIndex, int top
 }
 
 void Interface::displayPlaylists(MusicLibrary& library, int selectedIndex, int topIndex) {
+    fillRect(3, 13, 118, 38, ' ', PANEL_R, PANEL_G, PANEL_B);
     drawTabs(2, 8, 2);
     drawBox(2, 12, 196, 40, PANEL_R, PANEL_G, PANEL_B);
     drawTableHeader(4, 14, 2);
     drawPlaylistsRows(4, 17, library, selectedIndex, topIndex);
 
     vLine(121, 13, 38, '|', PANEL_R, PANEL_G, PANEL_B);
+}
+
+void Interface::displayPlaylistSongs(
+    Playlist* playlist,
+    int selectedIndex,
+    int topIndex
+) {
+	fillRect(3, 14, 118, 38, ' ', PANEL_R, PANEL_G, PANEL_B);
+
+    drawTabs(2, 8, 2);
+
+    drawBox(2, 12, 196, 40,
+        PANEL_R, PANEL_G, PANEL_B);
+
+    if (playlist != nullptr) {
+        writeAt(
+            4,
+            14,
+            "Playlist: " + playlist->getName(),
+            TITLE_R, TITLE_G, TITLE_B
+        );
+    }
+
+    drawTableHeader(4, 16, 1);
+
+    drawPlaylistSongsRows(
+        4,
+        19,
+        playlist,
+        selectedIndex,
+        topIndex
+    );
+
+    vLine(121, 14, 38, '|',
+        PANEL_R, PANEL_G, PANEL_B);
+}
+
+void Interface::drawPlaylistSongsRows(
+    int x,
+    int y,
+    Playlist* playlist,
+    int selectedIndex,
+    int topIndex
+) {
+    if (playlist == nullptr) return;
+
+    int currentIndex = topIndex;
+    int drawnRows = 0;
+
+    while (
+        currentIndex < playlist->getSize() &&
+        drawnRows < kLibraryVisibleRows
+        ) {
+        Song song = playlist->getSongAt(currentIndex);
+
+        int yy = y + drawnRows * 2 - 1;
+
+        bool selected = (currentIndex == selectedIndex);
+
+        string artist = fitText(song.getAuthor(), 30);
+        string title = fitText(song.getName(), 45);
+        string duration = formatDuration(song.getDuration());
+
+        fillRect(
+            x - 1,
+            yy,
+            117,
+            1,
+            ' ',
+            255, 255, 255,
+            selected ? SELECT_BG_R : BG_R,
+            selected ? SELECT_BG_G : BG_G,
+            selected ? SELECT_BG_B : BG_B
+        );
+
+        if (selected) {
+            writeAt(
+                x,
+                yy,
+                artist,
+                TITLE_R, TITLE_G, TITLE_B,
+                SELECT_BG_R, SELECT_BG_G, SELECT_BG_B
+            );
+
+            writeAt(
+                x + 37,
+                yy,
+                title,
+                TITLE_R, TITLE_G, TITLE_B,
+                SELECT_BG_R, SELECT_BG_G, SELECT_BG_B
+            );
+
+            writeAt(
+                x + 108,
+                yy,
+                duration,
+                TITLE_R, TITLE_G, TITLE_B,
+                SELECT_BG_R, SELECT_BG_G, SELECT_BG_B
+            );
+        }
+        else {
+            writeAt(
+                x,
+                yy,
+                artist,
+                SOFT_R, SOFT_G, SOFT_B,
+                BG_R, BG_G, BG_B
+            );
+
+            writeAt(
+                x + 37,
+                yy,
+                title,
+                SOFT_R, SOFT_G, SOFT_B,
+                BG_R, BG_G, BG_B
+            );
+
+            writeAt(
+                x + 108,
+                yy,
+                duration,
+                SOFT_R, SOFT_G, SOFT_B,
+                BG_R, BG_G, BG_B
+            );
+        }
+
+        currentIndex++;
+        drawnRows++;
+    }
+
+    if (drawnRows == 0) {
+        writeAt(
+            x,
+            y,
+            "La playlist no contiene canciones.",
+            DIM_R, DIM_G, DIM_B
+        );
+    }
 }
 
 void Interface::displayArtists(MusicLibrary& library, int selectedIndex, int topIndex) {
@@ -513,6 +653,7 @@ void Interface::displaySearch(MusicLibrary& library, int selectedIndex, int topI
     drawTabs(2, 8, 5);
 }
 void Interface::displayConsole() {
+    fillRect(3, 53, 50, 3, ' ', PANEL_R, PANEL_G, PANEL_B);
     drawBox(2, 52, 196, 5, PANEL_R, PANEL_G, PANEL_B);
 	writeAt(4, 53, "Waiting for input..", DIM_R, DIM_G, DIM_B);
 }
@@ -598,6 +739,283 @@ void Interface::refreshLibrarySelection(MusicLibrary& library, int previousSelec
         curr = curr->next;
         index++;
     }
+}
+
+void Interface::refreshPlaylistSongsSelection(
+    Playlist* playlist,
+    int previousSelectedIndex,
+    int selectedIndex,
+    int topIndex
+) {
+
+    if (playlist == nullptr) return;
+
+    int oldVisibleRow =
+        previousSelectedIndex - topIndex;
+
+    int newVisibleRow =
+        selectedIndex - topIndex;
+
+    // quitar highlight anterior
+    if (
+        oldVisibleRow >= 0 &&
+        oldVisibleRow < kLibraryVisibleRows
+        ) {
+
+        int y = 18 + oldVisibleRow * 2;
+
+        Song song =
+            playlist->getSongAt(previousSelectedIndex);
+
+        string artist =
+            fitText(song.getAuthor(), 30);
+
+        string title =
+            fitText(song.getName(), 45);
+
+        string duration =
+            formatDuration(song.getDuration());
+
+        fillRect(
+            3,
+            y,
+            117,
+            1,
+            ' ',
+            255, 255, 255,
+            BG_R, BG_G, BG_B
+        );
+
+        writeAt(
+            4,
+            y,
+            artist,
+            SOFT_R, SOFT_G, SOFT_B,
+            BG_R, BG_G, BG_B
+        );
+
+        writeAt(
+            41,
+            y,
+            title,
+            SOFT_R, SOFT_G, SOFT_B,
+            BG_R, BG_G, BG_B
+        );
+
+        writeAt(
+            112,
+            y,
+            duration,
+            SOFT_R, SOFT_G, SOFT_B,
+            BG_R, BG_G, BG_B
+        );
+    }
+
+    // dibujar nueva selección
+    if (
+        newVisibleRow >= 0 &&
+        newVisibleRow < kLibraryVisibleRows
+        ) {
+
+        int y = 18 + newVisibleRow * 2;
+
+        Song song =
+            playlist->getSongAt(selectedIndex);
+
+        string artist =
+            fitText(song.getAuthor(), 30);
+
+        string title =
+            fitText(song.getName(), 45);
+
+        string duration =
+            formatDuration(song.getDuration());
+
+        fillRect(
+            3,
+            y,
+            117,
+            1,
+            ' ',
+            255, 255, 255,
+            SELECT_BG_R,
+            SELECT_BG_G,
+            SELECT_BG_B
+        );
+
+        writeAt(
+            4,
+            y,
+            artist,
+            TITLE_R, TITLE_G, TITLE_B,
+            SELECT_BG_R,
+            SELECT_BG_G,
+            SELECT_BG_B
+        );
+
+        writeAt(
+            41,
+            y,
+            title,
+            TITLE_R, TITLE_G, TITLE_B,
+            SELECT_BG_R,
+            SELECT_BG_G,
+            SELECT_BG_B
+        );
+
+        writeAt(
+            112,
+            y,
+            duration,
+            TITLE_R, TITLE_G, TITLE_B,
+            SELECT_BG_R,
+            SELECT_BG_G,
+            SELECT_BG_B
+        );
+    }
+}
+
+void Interface::refreshPlaylistsSelection(
+    MusicLibrary& library,
+    int previousSelectedIndex,
+    int selectedIndex,
+    int topIndex
+) {
+
+    int oldVisibleRow =
+        previousSelectedIndex - topIndex;
+
+    int newVisibleRow =
+        selectedIndex - topIndex;
+
+    // quitar highlight anterior
+    if (
+        oldVisibleRow >= 0 &&
+        oldVisibleRow < kLibraryVisibleRows
+        ) {
+
+        int y = 17 + oldVisibleRow * 2;
+
+        Playlist* playlist =
+            library.getPlaylist(previousSelectedIndex);
+
+        if (playlist != nullptr) {
+
+            string user = "You";
+
+            string title =
+                fitText(playlist->getName(), 45);
+
+            string count =
+                to_string(playlist->getSize());
+
+            fillRect(
+                3,
+                y,
+                117,
+                1,
+                ' ',
+                255, 255, 255,
+                BG_R, BG_G, BG_B
+            );
+
+            writeAt(
+                4,
+                y,
+                user,
+                SOFT_R, SOFT_G, SOFT_B,
+                BG_R, BG_G, BG_B
+            );
+
+            writeAt(
+                41,
+                y,
+                title,
+                SOFT_R, SOFT_G, SOFT_B,
+                BG_R, BG_G, BG_B
+            );
+
+            writeAt(
+                112,
+                y,
+                count,
+                SOFT_R, SOFT_G, SOFT_B,
+                BG_R, BG_G, BG_B
+            );
+        }
+    }
+
+    // dibujar nueva selección
+    if (
+        newVisibleRow >= 0 &&
+        newVisibleRow < kLibraryVisibleRows
+        ) {
+
+        int y = 17 + newVisibleRow * 2;
+
+        Playlist* playlist =
+            library.getPlaylist(selectedIndex);
+
+        if (playlist != nullptr) {
+
+            string user = "You";
+
+            string title =
+                fitText(playlist->getName(), 45);
+
+            string count =
+                to_string(playlist->getSize());
+
+            fillRect(
+                3,
+                y,
+                117,
+                1,
+                ' ',
+                255, 255, 255,
+                SELECT_BG_R,
+                SELECT_BG_G,
+                SELECT_BG_B
+            );
+
+            writeAt(
+                4,
+                y,
+                user,
+                TITLE_R, TITLE_G, TITLE_B,
+                SELECT_BG_R,
+                SELECT_BG_G,
+                SELECT_BG_B
+            );
+
+            writeAt(
+                41,
+                y,
+                title,
+                TITLE_R, TITLE_G, TITLE_B,
+                SELECT_BG_R,
+                SELECT_BG_G,
+                SELECT_BG_B
+            );
+
+            writeAt(
+                112,
+                y,
+                count,
+                TITLE_R, TITLE_G, TITLE_B,
+                SELECT_BG_R,
+                SELECT_BG_G,
+                SELECT_BG_B
+            );
+        }
+    }
+}
+
+void Interface::refreshPlaylistRows(MusicLibrary& lib, int selectedIndex, int topIndex) {
+	drawPlaylistsRows(4, 17, lib, selectedIndex, topIndex);
+}
+void Interface::refreshPlaylistSongsRows(Playlist* playlist, int selectedIndex, int topIndex) {
+	drawPlaylistSongsRows(4, 19, playlist, selectedIndex, topIndex);
 }
 
 void Interface::displayMenu(MusicLibrary& library, int selectedIndex, int topIndex, bool playing) {

@@ -18,7 +18,8 @@ using uint = unsigned int;
 class MusicLibrary {
 private:
     int currentPlaylistIndex;
-    vector<Playlist> playlists;
+public: vector<Playlist> playlists;
+private:
     DoublyLinkedList<Song> allSongs;
     BinarySearchTree<Song*> songByNameTree;   
     Trie<Song*> songTrie;
@@ -45,12 +46,14 @@ private:
 public:
     MusicLibrary() : currentPlaylistIndex(-1),
         songByNameTree([](Song* a, Song* b) { return a->getName() < b->getName(); }) {
+        playlists.reserve(100);
     }
 
     
     void addPlaylist(const string& name) {
-        playlists.emplace_back(name);
-        if (currentPlaylistIndex == -1) currentPlaylistIndex = 0;
+        string newName = name;
+        playlists.emplace_back(newName);
+		if (currentPlaylistIndex == -1) currentPlaylistIndex = 0;
     }
 
     void removePlaylist(int index) {
@@ -69,15 +72,6 @@ public:
 
     Playlist* getCurrentPlaylist() {
         return getPlaylist(currentPlaylistIndex);
-    }
-
-    void setCurrentPlaylist(int index) {
-        if (index >= 0 && index < (int)playlists.size()) {
-            if (currentPlaylistIndex != -1 && currentPlaylistIndex != index) {
-                playlists[currentPlaylistIndex].stop();
-            }
-            currentPlaylistIndex = index;
-        }
     }
 
     int getPlaylistCount() const { return playlists.size(); }
@@ -284,27 +278,4 @@ public:
         playbackHistory.clear();
     }
 
-    void printPlaylists() const {
-        cout << "\n=== TUS PLAYLISTS ===\n";
-        for (int i = 0; i < (int)playlists.size(); i++) {
-            cout << (i == currentPlaylistIndex ? " > " : "   ")
-                << i << ". " << playlists[i].getName()
-                << " (" << playlists[i].getSize() << " canciones)\n";
-        }
-        if (playlists.empty()) cout << " No tienes playlists.\n";
-        cout << "=====================\n";
-    }
-
-    void printLibrary() const {
-        cout << "\n=== BIBLIOTECA GLOBAL ===\n";
-        Node<Song>* curr = allSongs.getHead();
-        uint i = 0;
-        while (curr != nullptr) {
-            cout << " " << i++ << ". " << curr->getValue().getName()
-                << " - " << curr->getValue().getAuthor() << "\n";
-            curr = curr->next;
-        }
-        if (allSongs.isEmpty()) cout << " Biblioteca vacia.\n";
-        cout << "=========================\n";
-    }
 };
