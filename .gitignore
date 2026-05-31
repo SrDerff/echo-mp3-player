@@ -1,0 +1,37 @@
+# Build folders
+Debug/
+Release/
+x64/
+x86/
+build/
+
+# Compiled files
+*.obj
+*.o
+*.exe
+*.dll
+*.lib
+*.pdb
+*.ilk
+
+# Visual Studio files
+.vs/
+*.VC.db
+*.VC.opendb
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# IntelliSense
+ipch/
+*.aps
+
+# Logs
+*.log
+
+# Misc
+*.tlog
+*.lastbuildstate
